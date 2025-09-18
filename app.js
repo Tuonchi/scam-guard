@@ -1,4 +1,5 @@
-    const analyzeBtn = document.getElementById('analyzeBtn');
+    // Character counter
+        const analyzeBtn = document.getElementById('analyzeBtn');
     const clearBtn = document.getElementById('clearBtn');
     const messageInput = document.getElementById('messageInput');
     const charCount = document.getElementById('charCount');
