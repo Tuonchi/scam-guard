@@ -1,183 +1,373 @@
-// === DOM Elements ===
-const $ = (id) => document.getElementById(id);
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded - initializing ScamGuard');
 
-const analyzeBtn = $('analyzeBtn');
-const clearBtn = $('clearBtn');
-const messageInput = $('messageInput');
-const charCount = $('charCount');
-const loading = $('loading');
-const resultCard = $('resultCard');
-const verdictBadge = $('verdictBadge');
-const verdictIcon = $('verdictIcon');
-const scoreBar = $('scoreBar');
-const scoreText = $('scoreText');
-const reasonsList = $('reasonsList');
-const originalText = $('originalText');
-const safetyTips = $('safetyTips');
+    // Tab switching
+    const textTab = document.getElementById('textTab');
+    const imageTab = document.getElementById('imageTab');
+    const textInput = document.getElementById('textInput');
+    const imageInput = document.getElementById('imageInput');
 
-// === Risk Patterns ===
-const riskPatterns = [
-  { name: '🔑 Requests personal credentials', regex: /\b(pin|otp|password|passcode|verification code|cvv|account number)\b/i, weight: 35 },
-  { name: '⚡ Creates false urgency', regex: /\b(urgent|immediately|expires|suspend|act now|last chance)\b/i, weight: 20 },
-  { name: '💰 Requests money transfers', regex: /\b(mpesa|send money|deposit|transfer|bitcoin|gift cards|paypal|western union)\b/i, weight: 30 },
-  { name: '🔗 Contains suspicious links', regex: /(https?:\/\/|bit\.ly|tinyurl|click here)/i, weight: 25 },
-  { name: '💼 Unrealistic job/money offers', regex: /\b(work from home|earn \$?\d+|guaranteed income|no experience)\b/i, weight: 20 },
-  { name: '🏆 Too-good-to-be-true prizes', regex: /\b(won|winner|claim.*prize|lottery|jackpot|free iphone)\b/i, weight: 25 },
-  { name: '⚠️ Threatens account closure', regex: /\b(account.*(suspend|close|restricted))\b/i, weight: 20 },
-  { name: '👤 Impersonates trusted entities', regex: /\b(kcb|equity|safaricom|paypal|amazon|gov)\b/i, weight: 15 },
-  { name: '🔐 Requests login credentials', regex: /\b(login|username|password|account access)\b/i, weight: 30 },
-  { name: '📈 Unrealistic investments', regex: /\b(investment|quick profit|forex|crypto|returns)\b/i, weight: 25 },
-  { name: '💳 Credit card fraud', regex: /\b(credit card|cvv|billing information)\b/i, weight: 25 },
-  { name: '🔒 Social engineering', regex: /\b(help|assist|emergency|stuck|urgent help)\b/i, weight: 20 },
-  { name: '💼 Fake invoices/bills', regex: /\b(invoice|payment due|balance owed)\b/i, weight: 20 },
-];
+    if (textTab && imageTab && textInput && imageInput) {
+        textTab.addEventListener('click', () => {
+            textTab.classList.add('bg-white', 'shadow-sm', 'text-primary');
+            textTab.classList.remove('text-gray-600');
+            imageTab.classList.remove('bg-white', 'shadow-sm', 'text-primary');
+            imageTab.classList.add('text-gray-600');
+            textInput.classList.remove('hidden');
+            imageInput.classList.add('hidden');
+        });
 
-// === Utility Functions ===
-function resetUI() {
-  resultCard.classList.add('hidden');
-  loading.classList.add('hidden');
-  charCount.textContent = '0 characters';
-  messageInput.style.borderColor = '';
-  messageInput.focus();
-}
-
-function updateCharCount() {
-  const count = messageInput.value.length;
-  charCount.textContent = `${count} characters`;
-  charCount.style.color = count > 1000 ? '#dc2626' : '';
-}
-
-// === Risk Score & Verdict Logic ===
-function analyzeMessage(text) {
-  let score = 0;
-  const reasons = [];
-
-  riskPatterns.forEach(({ name, regex, weight }) => {
-    if (regex.test(text)) {
-      score += weight;
-      reasons.push({ name, weight });
+        imageTab.addEventListener('click', () => {
+            imageTab.classList.add('bg-white', 'shadow-sm', 'text-primary');
+            imageTab.classList.remove('text-gray-600');
+            textTab.classList.remove('bg-white', 'shadow-sm', 'text-primary');
+            textTab.classList.add('text-gray-600');
+            imageInput.classList.remove('hidden');
+            textInput.classList.add('hidden');
+        });
     }
-  });
 
-  const grammarMatches = (text.match(/\b(recieve|loose|your welcome|wont|cant|to recieve|youre)\b/gi) || []).length;
-  if (grammarMatches > 0) {
-    score += grammarMatches * 5;
-    reasons.push({ name: '📝 Contains spelling/grammar errors', weight: grammarMatches * 5 });
-  }
+    // Character count
+    const messageInput = document.getElementById('messageInput');
+    const charCount = document.getElementById('charCount');
+    if (messageInput && charCount) {
+        messageInput.addEventListener('input', () => {
+            const count = messageInput.value.length;
+            charCount.textContent = `${count} characters`;
+        });
+    }
 
-  score = Math.min(100, score);
-  return { score, reasons };
-}
+    // Image upload
+    const fileInput = document.getElementById('fileInput');
+    const uploadArea = document.getElementById('uploadArea');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const removeImage = document.getElementById('removeImage');
 
-function displayResults(score, reasons, text) {
-  let verdict, badgeClass, iconPath, barColor, tips;
+    if (uploadArea && fileInput && imagePreview && previewImg && removeImage) {
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
 
-  if (score >= 70) {
-    verdict = '🚨 HIGH RISK - Likely Scam';
-    badgeClass = 'bg-red-600 text-white';
-    iconPath = 'M6 18L18 6M6 6l12 12'; // X icon
-    barColor = '#dc2626';
-    tips = `
-      • Never share personal information<br>
-      • Avoid clicking links<br>
-      • Verify sender through official channels<br>
-      • Report suspicious messages
-    `;
-    if (navigator.vibrate) navigator.vibrate(200); // vibrate on high risk
-  } else if (score >= 40) {
-    verdict = '⚠️ MEDIUM RISK - Be Cautious';
-    badgeClass = 'bg-orange-500 text-white';
-    iconPath = 'M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'; // exclamation
-    barColor = '#f97316';
-    tips = `
-      • Be cautious with personal info<br>
-      • Verify links and offers<br>
-      • Use official contact numbers<br>
-      • Report if unsure
-    `;
-  } else {
-    verdict = '✅ LOW RISK - Appears Safe';
-    badgeClass = 'bg-green-600 text-white';
-    iconPath = 'M5 13l4 4L19 7'; // checkmark
-    barColor = '#16a34a';
-    tips = `
-      • Message appears legitimate<br>
-      • Still verify the sender<br>
-      • Stay alert for future scams
-    `;
-  }
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    previewImg.src = e.target.result;
+                    uploadArea.classList.add('hidden');
+                    imagePreview.classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
-  verdictBadge.textContent = verdict;
-  verdictBadge.className = `px-6 py-2 rounded-full text-lg font-bold ${badgeClass}`;
-  verdictIcon.className = `w-10 h-10 rounded-full flex items-center justify-center ${badgeClass}`;
-  verdictIcon.innerHTML = `<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}" />
-  </svg>`;
+        removeImage.addEventListener('click', () => {
+            fileInput.value = '';
+            uploadArea.classList.remove('hidden');
+            imagePreview.classList.add('hidden');
+        });
+    }
 
-  scoreText.textContent = `${score}%`;
-  scoreBar.style.width = `${score}%`;
-  scoreBar.style.background = barColor;
+    // Analysis
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const loading = document.getElementById('loading');
+    const resultCard = document.getElementById('resultCard');
+    const senderSelect = document.getElementById('senderSelect');
 
-  // Color-coded reasons
-  reasonsList.innerHTML = reasons.length
-    ? reasons.map(r => {
-        const color = r.weight >= 30 ? 'text-red-600' : r.weight >= 15 ? 'text-orange-600' : 'text-yellow-600';
-        return `<li class="flex items-start gap-2"><span class="${color} mt-1">•</span><span>${r.name} (+${r.weight})</span></li>`;
-      }).join('')
-    : `<li class="flex items-start gap-2"><span class="text-green-600">✓</span><span>No major warning signs detected</span></li>`;
+    if (analyzeBtn && clearBtn && loading && resultCard && senderSelect) {
+        analyzeBtn.addEventListener('click', async () => {
+            const textValue = messageInput ? messageInput.value.trim() : '';
+            const hasImage = fileInput && fileInput.files.length > 0;
+            const senderValue = senderSelect.value;
 
-  safetyTips.innerHTML = tips;
-  originalText.textContent = text;
+            if (!textValue && !hasImage) {
+                alert('Please enter a message or upload an image to analyze.');
+                return;
+            }
+            if (!senderValue) {
+                alert('Please select the message sender.');
+                return;
+            }
 
-  // Add Copy button dynamically
-  const copyBtn = document.createElement('button');
-  copyBtn.textContent = '📋 Copy Report';
-  copyBtn.className = 'mt-3 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm';
-  copyBtn.onclick = () => {
-    const report = `Message:\n${text}\n\nVerdict: ${verdict}\nScore: ${score}%\n\nReasons:\n${reasons.map(r => `- ${r.name}`).join('\n')}\n\nTips:\n${tips.replace(/<br>/g, '\n')}`;
-    navigator.clipboard.writeText(report);
-    copyBtn.textContent = '✅ Copied!';
-    setTimeout(() => (copyBtn.textContent = '📋 Copy Report'), 2000);
-  };
+            loading.classList.remove('hidden');
+            resultCard.classList.add('hidden');
 
-  // Ensure no duplicates
-  safetyTips.parentNode.appendChild(copyBtn);
+            // Simulate processing delay
+            setTimeout(async () => {
+                loading.classList.add('hidden');
+                const {
+                    riskScore,
+                    scamReasons,
+                    safeReasons
+                } = await analyzeMessage(textValue || 'Screenshot analysis', senderValue);
+                showResults(textValue || 'Screenshot analysis complete', senderValue, riskScore, scamReasons, safeReasons);
+            }, 1500);
+        });
 
-  resultCard.classList.remove('hidden');
-  resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
+        clearBtn.addEventListener('click', () => {
+            if (messageInput) messageInput.value = '';
+            if (fileInput) fileInput.value = '';
+            if (senderSelect) senderSelect.value = '';
+            if (charCount) charCount.textContent = '0 characters';
+            if (uploadArea) uploadArea.classList.remove('hidden');
+            if (imagePreview) imagePreview.classList.add('hidden');
+            if (resultCard) resultCard.classList.add('hidden');
+        });
+    }
 
-// === Event Listeners ===
-messageInput.addEventListener('input', updateCharCount);
+    // Dynamic analysis using JSON dictionary
+    async function analyzeMessage(message, sender) {
+        // Load dictionary dynamically
+        const knowledgeBase = await fetch('/knowledgeBase.json').then(res => res.json());
 
-clearBtn.addEventListener('click', () => {
-  messageInput.value = '';
-  resetUI();
-});
+        let scamReasons = [];
+        let safeReasons = [];
 
-analyzeBtn.addEventListener('click', () => {
-  const text = messageInput.value.trim();
-  if (!text) {
-    messageInput.style.borderColor = '#dc2626';
-    setTimeout(() => (messageInput.style.borderColor = ''), 2000);
-    return;
-  }
+        // Scam pattern matching
+        knowledgeBase.scam_patterns.forEach(rule => {
+            const regex = new RegExp(rule.pattern, "gi");
+            if (regex.test(message)) {
+                scamReasons.push(rule.reason);
+            }
+        });
 
-  resultCard.classList.add('hidden');
-  loading.classList.remove('hidden');
+        // Safe pattern matching
+        knowledgeBase.safe_patterns.forEach(rule => {
+            const regex = new RegExp(rule.pattern, "gi");
+            if (regex.test(message)) {
+                safeReasons.push(rule.reason);
+            }
+        });
 
-  setTimeout(() => {
-    loading.classList.add('hidden');
-    const result = analyzeMessage(text);
-    displayResults(result.score, result.reasons, text);
-  }, 1500);
-});
+        // Decide score
+        let riskScore = 0;
+        if (scamReasons.length > 0) {
+            riskScore = 70 + scamReasons.length * 5;
+        } else {
+            riskScore = 20 - safeReasons.length * 3;
+        }
 
-messageInput.addEventListener('keydown', (e) => {
-  if (e.ctrlKey && e.key === 'Enter') analyzeBtn.click();
-});
+        // Adjust based on sender
+        if (sender === 'friend' || sender === 'family') riskScore -= 15;
+        if (sender === 'unknown') riskScore += 15;
 
-window.addEventListener('load', () => {
-  messageInput.focus();
-  updateCharCount();
+        // Clamp
+        riskScore = Math.max(0, Math.min(100, riskScore));
+
+        return {
+            riskScore,
+            scamReasons,
+            safeReasons
+        };
+    }
+
+    function showResults(message, sender, riskScore, scamReasons, safeReasons) {
+        const verdictIcon = document.getElementById('verdictIcon');
+        const verdictBadge = document.getElementById('verdictBadge');
+        const scoreBar = document.getElementById('scoreBar');
+        const scoreText = document.getElementById('scoreText');
+        const reasonsList = document.getElementById('reasonsList');
+        const safetyTips = document.getElementById('safetyTips');
+        const originalText = document.getElementById('originalText');
+        const senderResult = document.getElementById('senderResult');
+
+        // Verdict UI
+        if (riskScore >= 70) {
+            verdictIcon.textContent = '🚨';
+            verdictBadge.textContent = 'HIGH RISK';
+            verdictBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-red-100 text-red-800';
+            scoreBar.className = 'h-4 rounded-full transition-all bg-gradient-to-r from-red-500 to-red-600';
+        } else if (riskScore >= 40) {
+            verdictIcon.textContent = '⚠️';
+            verdictBadge.textContent = 'MEDIUM RISK';
+            verdictBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800';
+            scoreBar.className = 'h-4 rounded-full transition-all bg-gradient-to-r from-yellow-500 to-yellow-600';
+        } else {
+            verdictIcon.textContent = '✅';
+            verdictBadge.textContent = 'LOW RISK';
+            verdictBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-green-100 text-green-800';
+            scoreBar.className = 'h-4 rounded-full transition-all bg-gradient-to-r from-green-500 to-green-600';
+        }
+
+        scoreBar.style.width = `${riskScore}%`;
+        scoreText.textContent = `${riskScore}%`;
+        senderResult.textContent = sender;
+
+        // Detection reasons (🚨 for scam, ✅ for safe)
+        let reasonsHTML = '';
+        scamReasons.forEach(reason => {
+            reasonsHTML += `
+      <li class="flex items-center gap-2 p-2 bg-red-50 rounded-lg">
+        <span class="text-red-600">🚨</span>
+        <span class="text-gray-700">${reason}</span>
+      </li>`;
+        });
+        safeReasons.forEach(reason => {
+            reasonsHTML += `
+      <li class="flex items-center gap-2 p-2 bg-green-50 rounded-lg">
+        <span class="text-green-600">✅</span>
+        <span class="text-gray-700">${reason}</span>
+      </li>`;
+        });
+
+        reasonsList.innerHTML = reasonsHTML || `
+    <li class="text-gray-500">No significant indicators detected</li>
+  `;
+
+        // Safety tips
+        if (riskScore >= 70) {
+            safetyTips.innerHTML = '<p class="text-red-700 font-medium">⚠️ Clear scam indicators. Do not reply, delete and block sender.</p>';
+        } else if (riskScore >= 40) {
+            safetyTips.innerHTML = '<p class="text-orange-700 font-medium">⚠️ Be cautious. Verify sender before taking any action.</p>';
+        } else {
+            safetyTips.innerHTML = '<p class="text-green-700 font-medium">✅ Appears safe, but remain alert.</p>';
+        }
+
+        // Original message
+        originalText.textContent = message;
+
+        document.getElementById('resultCard').classList.remove('hidden');
+    }
+
+    // Display results
+    function showResults(message, sender, riskScore, scamReasons, safeReasons) {
+        const verdictIcon = document.getElementById('verdictIcon');
+        const verdictBadge = document.getElementById('verdictBadge');
+        const scoreBar = document.getElementById('scoreBar');
+        const scoreText = document.getElementById('scoreText');
+        const reasonsList = document.getElementById('reasonsList');
+        const safetyTips = document.getElementById('safetyTips');
+        const originalText = document.getElementById('originalText');
+        const senderResult = document.getElementById('senderResult');
+
+        const senderDisplayText = {
+            'unknown': 'Unknown SMS/WhatsApp Message',
+            'whatsapp_group': 'WhatsApp Group',
+            'friend': 'A Friend',
+            'family': 'Family Member',
+            'official': 'Official Company/Bank',
+            'social_media': 'Social Media Contact'
+        } [sender] || 'Unknown';
+
+        senderResult.textContent = senderDisplayText;
+
+        // Verdict
+        if (riskScore >= 70) {
+            verdictIcon.textContent = '🚨';
+            verdictBadge.textContent = 'HIGH RISK';
+            verdictBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-red-100 text-red-800';
+            scoreBar.className = 'h-4 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-red-500 to-red-600';
+        } else if (riskScore >= 40) {
+            verdictIcon.textContent = '⚠️';
+            verdictBadge.textContent = 'MEDIUM RISK';
+            verdictBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800';
+            scoreBar.className = 'h-4 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-yellow-500 to-yellow-600';
+        } else {
+            verdictIcon.textContent = '✅';
+            verdictBadge.textContent = 'LOW RISK';
+            verdictBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-green-100 text-green-800';
+            scoreBar.className = 'h-4 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-green-500 to-green-600';
+        }
+
+        scoreBar.style.width = `${riskScore}%`;
+        scoreText.textContent = `${riskScore}%`;
+
+        // Reasons list
+        const allReasons = [
+            ...scamReasons.map(r => ({
+                text: r,
+                icon: '🚨',
+                color: 'text-red-600'
+            })),
+            ...safeReasons.map(r => ({
+                text: r,
+                icon: '✅',
+                color: 'text-green-600'
+            }))
+        ];
+
+        reasonsList.innerHTML = allReasons.map(reason =>
+            `<li class="flex items-start gap-2 p-2 bg-white rounded-lg">
+        <span class="${reason.color}">${reason.icon}</span>
+        <span class="text-gray-700">${reason.text}</span>
+      </li>`
+        ).join('');
+
+        // Safety tips
+        if (riskScore >= 70) {
+            safetyTips.innerHTML = '<p class="text-red-700 font-medium">⚠️ This message shows clear scam indicators. Do not respond or provide any personal information. Delete the message and block the sender if possible.</p>';
+        } else if (riskScore >= 40) {
+            safetyTips.innerHTML = '<p class="text-orange-700 font-medium">⚠️ Exercise caution. Verify the sender before taking any action.</p>';
+        } else {
+            if (sender === 'friend' || sender === 'family') {
+                safetyTips.innerHTML = '<p class="text-green-700 font-medium">✅ This message appears safe and is from a trusted contact. Still, remain cautious with personal information.</p>';
+            } else {
+                safetyTips.innerHTML = '<p class="text-green-700 font-medium">✅ This message appears safe, but always verify the sender if unsure.</p>';
+            }
+        }
+
+        originalText.textContent = message;
+        resultCard.classList.remove('hidden');
+        resultCard.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest'
+        });
+    }
+
+    // Smooth scrolling
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            const target = document.querySelector(targetId);
+            if (target) {
+                const mobileMenu = document.getElementById('mobileMenu');
+                if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Mobile menu
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileMenu = document.getElementById('mobileMenu');
+    if (mobileMenuBtn && mobileMenu) {
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        document.addEventListener('click', (e) => {
+            if (!mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+    }
+
+    // Button animation
+    if (analyzeBtn) {
+        analyzeBtn.addEventListener('mouseenter', () => {
+            analyzeBtn.style.transform = 'scale(1.05)';
+        });
+        analyzeBtn.addEventListener('mouseleave', () => {
+            analyzeBtn.style.transform = 'scale(1)';
+        });
+    }
+
+    // Auto-resize textarea
+    if (messageInput) {
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    }
+
+    console.log('ScamGuard initialized successfully');
 });

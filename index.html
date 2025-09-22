@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ScamGuard – Detect Scams Instantly</title>
+  <link rel="icon" href="ScamGuard-logo.svg" type="image/svg+xml">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -19,6 +20,7 @@
       }
     }
   </script>
+  <script src="app.js" defer></script>
 </head>
 
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800">
@@ -26,32 +28,57 @@
   <nav class="bg-white/90 backdrop-blur-md shadow-lg fixed w-full top-0 left-0 z-50 border-b border-gray-200">
     <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
       <a href="#home"
-        class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-        🛡️ ScamGuard
+        class="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent flex items-center space-x-3">
+
+        <svg class="w-12" width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background rectangle (mimicking div with bg-blue-600, rounded-xl) -->
+          <rect x="0" y="0" width="64" height="64" rx="12" fill="#10B981"></rect>
+
+          <!-- Icon (checkmark in a shield) centered -->
+          <svg x="16" y="16" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path
+              d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
+            </path>
+          </svg>
+        </svg>
+        <span>ScamGuard</span>
       </a>
       <ul class="hidden md:flex space-x-8 font-medium">
-        <li><a href="#home" class="hover:text-primary transition-colors duration-200">Detect Scam</a></li>
-        <li><a href="#tips" class="hover:text-primary transition-colors duration-200">Safety Tips</a></li>
-        <li><a href="#hotlines" class="hover:text-primary transition-colors duration-200">Hotlines</a></li>
-        <li><a href="#about" class="hover:text-primary transition-colors duration-200">About</a></li>
+        <li><a href="#home" class="hover:text-primary">Detect Scam</a></li>
+        <li><a href="#tips" class="hover:text-primary">Safety Tips</a></li>
+        <li><a href="#hotlines" class="hover:text-primary">Hotlines</a></li>
+        <li><a href="#about" class="hover:text-primary">About</a></li>
       </ul>
-      <!-- Mobile menu button -->
-      <button id="mobileMenuBtn" class="md:hidden text-gray-600 hover:text-primary">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+      <!-- Side nav button -->
+      <button id="sideNavBtn" class="md:hidden text-gray-600 hover:text-primary">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
     </div>
-    <!-- Mobile menu (hidden by default) -->
-    <div id="mobileMenu" class="md:hidden hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-4">
-      <ul class="flex flex-col space-y-2 font-medium">
-        <li><a href="#home" class="block py-2 hover:text-primary transition-colors duration-200">Detect Scam</a></li>
-        <li><a href="#tips" class="block py-2 hover:text-primary transition-colors duration-200">Safety Tips</a></li>
-        <li><a href="#hotlines" class="block py-2 hover:text-primary transition-colors duration-200">Hotlines</a></li>
-        <li><a href="#about" class="block py-2 hover:text-primary transition-colors duration-200">About</a></li>
-      </ul>
-    </div>
   </nav>
+
+  <!-- === Side Nav (Drawer) === -->
+  <div id="sideNav"
+    class="fixed top-0 left-0 h-full w-64 bg-white shadow-2xl transform -translate-x-full transition-transform duration-300 z-50">
+    <div class="p-6 flex items-center justify-between border-b">
+      <span class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">🛡️
+        ScamGuard</span>
+      <button id="closeSideNav" class="text-gray-600 hover:text-red-500">
+        ✖
+      </button>
+    </div>
+    <ul class="flex flex-col p-6 space-y-4 font-medium">
+      <li><a href="#home" class="block hover:text-primary">Detect Scam</a></li>
+      <li><a href="#tips" class="block hover:text-primary">Safety Tips</a></li>
+      <li><a href="#hotlines" class="block hover:text-primary">Hotlines</a></li>
+      <li><a href="#about" class="block hover:text-primary">About</a></li>
+    </ul>
+  </div>
+
+  <!-- === Overlay for Side Nav === -->
+  <div id="sideNavOverlay" class="fixed inset-0 bg-black/50 hidden z-40"></div>
 
   <main class="pt-20">
     <!-- === Hero Section === -->
@@ -408,296 +435,25 @@
   </footer>
 
   <script>
-    // Wait for DOM to be fully loaded
-    document.addEventListener('DOMContentLoaded', function () {
-      console.log('DOM loaded - initializing ScamGuard');
+    // Side nav toggle
+    const sideNavBtn = document.getElementById('sideNavBtn');
+    const sideNav = document.getElementById('sideNav');
+    const closeSideNav = document.getElementById('closeSideNav');
+    const overlay = document.getElementById('sideNavOverlay');
 
-      // Tab switching functionality
-      const textTab = document.getElementById('textTab');
-      const imageTab = document.getElementById('imageTab');
-      const textInput = document.getElementById('textInput');
-      const imageInput = document.getElementById('imageInput');
+    sideNavBtn.addEventListener('click', () => {
+      sideNav.classList.remove('-translate-x-full');
+      overlay.classList.remove('hidden');
+    });
 
-      if (textTab && imageTab && textInput && imageInput) {
-        textTab.addEventListener('click', () => {
-          textTab.classList.add('bg-white', 'shadow-sm', 'text-primary');
-          textTab.classList.remove('text-gray-600');
-          imageTab.classList.remove('bg-white', 'shadow-sm', 'text-primary');
-          imageTab.classList.add('text-gray-600');
-          textInput.classList.remove('hidden');
-          imageInput.classList.add('hidden');
-        });
+    closeSideNav.addEventListener('click', () => {
+      sideNav.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
+    });
 
-        imageTab.addEventListener('click', () => {
-          imageTab.classList.add('bg-white', 'shadow-sm', 'text-primary');
-          imageTab.classList.remove('text-gray-600');
-          textTab.classList.remove('bg-white', 'shadow-sm', 'text-primary');
-          textTab.classList.add('text-gray-600');
-          imageInput.classList.remove('hidden');
-          textInput.classList.add('hidden');
-        });
-      }
-
-      // Character count
-      const messageInput = document.getElementById('messageInput');
-      const charCount = document.getElementById('charCount');
-
-      if (messageInput && charCount) {
-        messageInput.addEventListener('input', () => {
-          const count = messageInput.value.length;
-          charCount.textContent = `${count} characters`;
-        });
-      }
-
-      // Image upload functionality
-      const fileInput = document.getElementById('fileInput');
-      const uploadArea = document.getElementById('uploadArea');
-      const imagePreview = document.getElementById('imagePreview');
-      const previewImg = document.getElementById('previewImg');
-      const removeImage = document.getElementById('removeImage');
-
-      if (uploadArea && fileInput && imagePreview && previewImg && removeImage) {
-        uploadArea.addEventListener('click', () => {
-          fileInput.click();
-        });
-
-        fileInput.addEventListener('change', (e) => {
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              previewImg.src = e.target.result;
-              uploadArea.classList.add('hidden');
-              imagePreview.classList.remove('hidden');
-            };
-            reader.readAsDataURL(file);
-          }
-        });
-
-        removeImage.addEventListener('click', () => {
-          fileInput.value = '';
-          uploadArea.classList.remove('hidden');
-          imagePreview.classList.add('hidden');
-        });
-      }
-
-      // Analysis functionality (mock implementation)
-      const analyzeBtn = document.getElementById('analyzeBtn');
-      const clearBtn = document.getElementById('clearBtn');
-      const loading = document.getElementById('loading');
-      const resultCard = document.getElementById('resultCard');
-      const senderSelect = document.getElementById('senderSelect');
-
-      if (analyzeBtn && clearBtn && loading && resultCard && senderSelect) {
-        analyzeBtn.addEventListener('click', () => {
-          const textValue = messageInput ? messageInput.value.trim() : '';
-          const hasImage = fileInput && fileInput.files.length > 0;
-          const senderValue = senderSelect.value;
-
-          if (!textValue && !hasImage) {
-            alert('Please enter a message or upload an image to analyze.');
-            return;
-          }
-
-          if (!senderValue) {
-            alert('Please select the message sender.');
-            return;
-          }
-
-          // Show loading
-          loading.classList.remove('hidden');
-          resultCard.classList.add('hidden');
-
-          // Mock analysis (replace with real API call)
-          setTimeout(() => {
-            loading.classList.add('hidden');
-            showResults(textValue || 'Screenshot analysis complete', senderValue);
-          }, 2000);
-        });
-
-        clearBtn.addEventListener('click', () => {
-          if (messageInput) messageInput.value = '';
-          if (fileInput) fileInput.value = '';
-          if (senderSelect) senderSelect.value = '';
-          if (charCount) charCount.textContent = '0 characters';
-          if (uploadArea) uploadArea.classList.remove('hidden');
-          if (imagePreview) imagePreview.classList.add('hidden');
-          if (resultCard) resultCard.classList.add('hidden');
-        });
-      }
-
-      function showResults(message, sender) {
-        const verdictIcon = document.getElementById('verdictIcon');
-        const verdictBadge = document.getElementById('verdictBadge');
-        const scoreBar = document.getElementById('scoreBar');
-        const scoreText = document.getElementById('scoreText');
-        const reasonsList = document.getElementById('reasonsList');
-        const safetyTips = document.getElementById('safetyTips');
-        const originalText = document.getElementById('originalText');
-        const senderResult = document.getElementById('senderResult');
-
-        if (!verdictIcon || !verdictBadge || !scoreBar || !scoreText || !reasonsList || !safetyTips || !originalText || !senderResult) {
-          console.error('One or more result elements not found');
-          return;
-        }
-
-        // Mock analysis results - consider sender in risk assessment
-        const isScam = message.toLowerCase().includes('win') ||
-          message.toLowerCase().includes('pin') ||
-          message.toLowerCase().includes('congratulations') ||
-          message.toLowerCase().includes('claim') ||
-          message.toLowerCase().includes('urgent');
-
-        // Adjust risk based on sender
-        let baseRiskScore = isScam ? Math.floor(Math.random() * 30) + 70 : Math.floor(Math.random() * 40) + 10;
-
-        // Adjust risk based on sender type
-        if (sender === 'friend' || sender === 'family') {
-          baseRiskScore = Math.max(0, baseRiskScore - 20); // Lower risk for known contacts
-        } else if (sender === 'official') {
-          baseRiskScore = Math.max(0, baseRiskScore - 10); // Slightly lower for official sources
-        } else if (sender === 'unknown') {
-          baseRiskScore = Math.min(100, baseRiskScore + 15); // Higher risk for unknown senders
-        }
-
-        const riskScore = Math.min(100, Math.max(0, baseRiskScore)); // Ensure score is between 0-100
-
-        // Set sender display text
-        const senderDisplayText = {
-          'unknown': 'Unknown SMS/WhatsApp Message',
-          'whatsapp_group': 'WhatsApp Group',
-          'friend': 'A Friend',
-          'family': 'Family Member',
-          'official': 'Official Company/Bank',
-          'social_media': 'Social Media Contact'
-        }[sender] || 'Unknown';
-
-        senderResult.textContent = senderDisplayText;
-
-        // Set verdict
-        if (riskScore >= 70) {
-          verdictIcon.textContent = '🚨';
-          verdictBadge.textContent = 'HIGH RISK';
-          verdictBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-red-100 text-red-800';
-          scoreBar.className = 'h-4 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-red-500 to-red-600';
-        } else if (riskScore >= 40) {
-          verdictIcon.textContent = '⚠️';
-          verdictBadge.textContent = 'MEDIUM RISK';
-          verdictBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-yellow-100 text-yellow-800';
-          scoreBar.className = 'h-4 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-yellow-500 to-yellow-600';
-        } else {
-          verdictIcon.textContent = '✅';
-          verdictBadge.textContent = 'LOW RISK';
-          verdictBadge.className = 'px-4 py-2 rounded-full text-sm font-bold bg-green-100 text-green-800';
-          scoreBar.className = 'h-4 rounded-full transition-all duration-1000 ease-out bg-gradient-to-r from-green-500 to-green-600';
-        }
-
-        scoreBar.style.width = `${riskScore}%`;
-        scoreText.textContent = `${riskScore}%`;
-
-        // Set reasons - include sender context
-        let reasons = [];
-        if (isScam) {
-          reasons = ['Contains prize/winning language', 'Requests sensitive information', 'Creates false urgency', 'Uses suspicious links'];
-          if (sender === 'unknown') {
-            reasons.push('Message from unknown sender');
-          }
-        } else {
-          reasons = ['No obvious scam indicators', 'Language appears legitimate', 'No urgent demands', 'No request for personal information'];
-          if (sender === 'friend' || sender === 'family') {
-            reasons.push('Message from trusted contact');
-          }
-        }
-
-        reasonsList.innerHTML = reasons.map(reason =>
-          `<li class="flex items-start gap-2 p-2 bg-white rounded-lg">
-            <span class="text-primary">•</span>
-            <span class="text-gray-700">${reason}</span>
-          </li>`
-        ).join('');
-
-        // Set safety tips - include sender context
-        if (riskScore >= 70) {
-          safetyTips.innerHTML = '<p class="text-red-700 font-medium">⚠️ This message shows clear scam indicators. Do not respond or provide any personal information. Delete the message and block the sender if possible.</p>';
-        } else if (riskScore >= 40) {
-          safetyTips.innerHTML = '<p class="text-orange-700 font-medium">⚠️ Exercise caution with this message. Verify the sender\'s identity before taking any action.</p>';
-        } else {
-          if (sender === 'friend' || sender === 'family') {
-            safetyTips.innerHTML = '<p class="text-green-700 font-medium">✅ This message appears safe and is from a trusted contact. Still, remain cautious with personal information.</p>';
-          } else {
-            safetyTips.innerHTML = '<p class="text-green-700 font-medium">✅ This message appears safe, but always verify the sender if unsure about any requests.</p>';
-          }
-        }
-
-        // Set original message
-        originalText.textContent = message;
-
-        resultCard.classList.remove('hidden');
-
-        // Scroll to results
-        resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
-
-      // Smooth scrolling for navigation
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-          e.preventDefault();
-          const targetId = this.getAttribute('href');
-          if (targetId === '#') return;
-
-          const target = document.querySelector(targetId);
-          if (target) {
-            // Close mobile menu if open
-            const mobileMenu = document.getElementById('mobileMenu');
-            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
-              mobileMenu.classList.add('hidden');
-            }
-
-            target.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start'
-            });
-          }
-        });
-      });
-
-      // Mobile menu functionality
-      const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-      const mobileMenu = document.getElementById('mobileMenu');
-
-      if (mobileMenuBtn && mobileMenu) {
-        mobileMenuBtn.addEventListener('click', () => {
-          mobileMenu.classList.toggle('hidden');
-        });
-
-        // Close menu when clicking outside
-        document.addEventListener('click', (e) => {
-          if (!mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-            mobileMenu.classList.add('hidden');
-          }
-        });
-      }
-
-      // Add loading animation to analyze button
-      if (analyzeBtn) {
-        analyzeBtn.addEventListener('mouseenter', () => {
-          analyzeBtn.style.transform = 'scale(1.05)';
-        });
-
-        analyzeBtn.addEventListener('mouseleave', () => {
-          analyzeBtn.style.transform = 'scale(1)';
-        });
-      }
-
-      // Auto-resize textarea
-      if (messageInput) {
-        messageInput.addEventListener('input', function () {
-          this.style.height = 'auto';
-          this.style.height = this.scrollHeight + 'px';
-        });
-      }
-
-      console.log('ScamGuard initialized successfully');
+    overlay.addEventListener('click', () => {
+      sideNav.classList.add('-translate-x-full');
+      overlay.classList.add('hidden');
     });
   </script>
 </body>

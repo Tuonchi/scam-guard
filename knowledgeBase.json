@@ -1,0 +1,66 @@
+{
+  "scam_patterns": [
+    {
+      "pattern": "\\bwin\\b|\\bcongratulations\\b|\\bprize\\b",
+      "reason": "Contains winning/prize claim language"
+    },
+    {
+      "pattern": "\\bclaim\\b|\\bredeem\\b|\\boffer ends\\b",
+      "reason": "Creates urgency to claim rewards"
+    },
+    {
+      "pattern": "\\burgent\\b|\\bimmediately\\b|\\bnow\\b",
+      "reason": "False urgency tactic used by scammers"
+    },
+    {
+      "pattern": "\\bpin\\b|\\bOTP\\b|\\bpassword\\b",
+      "reason": "Requests sensitive credentials"
+    },
+    {
+      "pattern": "http[s]?:\\/\\/(?!www\\.(safaricom|equitybank|kcbgroup|co-opbank)\\.co\\.ke)",
+      "reason": "Suspicious or non-official link detected"
+    },
+    {
+      "pattern": "\\bM[- ]?Pesa\\b.{0,15}(confirm|reverse|refund)",
+      "reason": "Suspicious M-Pesa reversal or confirmation request"
+    },
+    {
+      "pattern": "\\bloan approved\\b|\\bquick loan\\b|\\bno collateral\\b",
+      "reason": "Predatory or fake loan offer"
+    },
+    {
+      "pattern": "\\bjob\\b.{0,20}\\bfee\\b|\\bregistration fee\\b",
+      "reason": "Job scam requiring upfront payment"
+    },
+    {
+      "pattern": "\\bcall this number\\b|\\bcontact us immediately\\b",
+      "reason": "Pushes urgent unsolicited contact"
+    }
+  ],
+  "safe_patterns": [
+    {
+      "pattern": "\\bthank you\\b|\\bthanks\\b",
+      "reason": "Polite and normal conversation language"
+    },
+    {
+      "pattern": "\\bmeeting\\b|\\bappointment\\b|\\bschedule\\b",
+      "reason": "Legitimate scheduling context"
+    },
+    {
+      "pattern": "\\bhello\\b|\\bhi\\b|\\bgood morning\\b|\\bgood evening\\b",
+      "reason": "Common greeting from personal contacts"
+    },
+    {
+      "pattern": "\\bsee you\\b|\\bcatch up\\b|\\btalk later\\b",
+      "reason": "Casual personal conversation"
+    },
+    {
+      "pattern": "\\binvoice\\b|\\breceipt\\b|\\border number\\b",
+      "reason": "Likely a legitimate transaction"
+    },
+    {
+      "pattern": "\\bmeeting link\\b|\\bzoom\\b|\\bgoogle meet\\b",
+      "reason": "Work/learning related communication"
+    }
+  ]
+}

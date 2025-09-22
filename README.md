@@ -4,6 +4,8 @@
 
 ScamGuard is an AI-powered web application built to protect Kenyans from the growing threat of digital scams—especially those targeting mobile money users and job seekers. By leveraging Natural Language Processing (NLP) and machine learning, ScamGuard analyzes suspicious messages and flags potential fraud in real time. Whether it's a fake job offer, a phishing link, or a deceptive payment request, ScamGuard helps users stay safe and informed.
 
+![Screenshot](screenshot.png)
+
 ## 🎯 Objectives
 
 - Detect and flag scam messages using AI
