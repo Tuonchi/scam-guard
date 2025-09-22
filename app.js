@@ -33,7 +33,6 @@ const riskPatterns = [
 ];
 
 // === Utility Functions ===
-
 function resetUI() {
   resultCard.classList.add('hidden');
   loading.classList.add('hidden');
@@ -49,17 +48,14 @@ function updateCharCount() {
 }
 
 // === Risk Score & Verdict Logic ===
-
 function analyzeMessage(text) {
   let score = 0;
   const reasons = [];
-  const matches = [];
 
   riskPatterns.forEach(({ name, regex, weight }) => {
     if (regex.test(text)) {
       score += weight;
       reasons.push({ name, weight });
-      matches.push(name);
     }
   });
 
@@ -70,16 +66,16 @@ function analyzeMessage(text) {
   }
 
   score = Math.min(100, score);
-  return { score, reasons, matches };
+  return { score, reasons };
 }
 
 function displayResults(score, reasons, text) {
-  let verdict, badgeClass, iconColor, barColor, tips;
+  let verdict, badgeClass, iconPath, barColor, tips;
 
   if (score >= 70) {
     verdict = '🚨 HIGH RISK - Likely Scam';
     badgeClass = 'bg-red-600 text-white';
-    iconColor = 'text-white';
+    iconPath = 'M6 18L18 6M6 6l12 12'; // X icon
     barColor = '#dc2626';
     tips = `
       • Never share personal information<br>
@@ -87,10 +83,11 @@ function displayResults(score, reasons, text) {
       • Verify sender through official channels<br>
       • Report suspicious messages
     `;
+    if (navigator.vibrate) navigator.vibrate(200); // vibrate on high risk
   } else if (score >= 40) {
     verdict = '⚠️ MEDIUM RISK - Be Cautious';
     badgeClass = 'bg-orange-500 text-white';
-    iconColor = 'text-white';
+    iconPath = 'M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'; // exclamation
     barColor = '#f97316';
     tips = `
       • Be cautious with personal info<br>
@@ -101,7 +98,7 @@ function displayResults(score, reasons, text) {
   } else {
     verdict = '✅ LOW RISK - Appears Safe';
     badgeClass = 'bg-green-600 text-white';
-    iconColor = 'text-white';
+    iconPath = 'M5 13l4 4L19 7'; // checkmark
     barColor = '#16a34a';
     tips = `
       • Message appears legitimate<br>
@@ -113,31 +110,44 @@ function displayResults(score, reasons, text) {
   verdictBadge.textContent = verdict;
   verdictBadge.className = `px-6 py-2 rounded-full text-lg font-bold ${badgeClass}`;
   verdictIcon.className = `w-10 h-10 rounded-full flex items-center justify-center ${badgeClass}`;
-  verdictIcon.innerHTML = `<svg class="w-6 h-6 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-      d="${score >= 70 ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' : 
-         score >= 40 ? 'M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z' :
-         'M5 13l4 4L19 7'}" />
+  verdictIcon.innerHTML = `<svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}" />
   </svg>`;
 
   scoreText.textContent = `${score}%`;
   scoreBar.style.width = `${score}%`;
   scoreBar.style.background = barColor;
 
-  // Show reasons
+  // Color-coded reasons
   reasonsList.innerHTML = reasons.length
-    ? reasons.map(r => `<li class="flex items-start gap-2"><span class="text-orange-600 mt-1">•</span><span>${r.name} (+${r.weight})</span></li>`).join('')
+    ? reasons.map(r => {
+        const color = r.weight >= 30 ? 'text-red-600' : r.weight >= 15 ? 'text-orange-600' : 'text-yellow-600';
+        return `<li class="flex items-start gap-2"><span class="${color} mt-1">•</span><span>${r.name} (+${r.weight})</span></li>`;
+      }).join('')
     : `<li class="flex items-start gap-2"><span class="text-green-600">✓</span><span>No major warning signs detected</span></li>`;
 
   safetyTips.innerHTML = tips;
   originalText.textContent = text;
+
+  // Add Copy button dynamically
+  const copyBtn = document.createElement('button');
+  copyBtn.textContent = '📋 Copy Report';
+  copyBtn.className = 'mt-3 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg text-sm';
+  copyBtn.onclick = () => {
+    const report = `Message:\n${text}\n\nVerdict: ${verdict}\nScore: ${score}%\n\nReasons:\n${reasons.map(r => `- ${r.name}`).join('\n')}\n\nTips:\n${tips.replace(/<br>/g, '\n')}`;
+    navigator.clipboard.writeText(report);
+    copyBtn.textContent = '✅ Copied!';
+    setTimeout(() => (copyBtn.textContent = '📋 Copy Report'), 2000);
+  };
+
+  // Ensure no duplicates
+  safetyTips.parentNode.appendChild(copyBtn);
 
   resultCard.classList.remove('hidden');
   resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // === Event Listeners ===
-
 messageInput.addEventListener('input', updateCharCount);
 
 clearBtn.addEventListener('click', () => {
