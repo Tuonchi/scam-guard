@@ -1,66 +1,202 @@
 {
   "scam_patterns": [
     {
-      "pattern": "\\bwin\\b|\\bcongratulations\\b|\\bprize\\b",
-      "reason": "Contains winning/prize claim language"
+      "pattern": "\\b(loan|credit|advance|emergency)\\b.*\\b(5K|10K|20K|50K|100K|250K|500K|1M|1.2M|1.4M|2.5M)\\b",
+      "reason": "Fraudulent loan offers specifying specific amounts to appear authentic."
     },
     {
-      "pattern": "\\bclaim\\b|\\bredeem\\b|\\boffer ends\\b",
-      "reason": "Creates urgency to claim rewards"
+      "pattern": "\\b(no crb|no guarantor|no collateral|no savings|no shares|no change of pay point)\\b",
+      "reason": "Scammers lower barriers to entry by promising no credit history checks or collateral, targeting those who can't get loans elsewhere."
     },
     {
-      "pattern": "\\burgent\\b|\\bimmediately\\b|\\bnow\\b",
-      "reason": "False urgency tactic used by scammers"
+      "pattern": "\\bcheck[- ]?off loan\\b|\\bcivil servants?\\b.*\\bloan\\b",
+      "reason": "Check-off loan scams specifically target salaried and civil servant employees for payroll deductions."
     },
     {
-      "pattern": "\\bpin\\b|\\bOTP\\b|\\bpassword\\b",
-      "reason": "Requests sensitive credentials"
+      "pattern": "\\b(ID both sides|payslip|passport size photo|mpesa statement|KRA pin)\\b",
+      "reason": "Requests for minimal, but sensitive, personal documentation that can be used for identity theft."
     },
     {
-      "pattern": "http[s]?:\\/\\/(?!www\\.(safaricom|equitybank|kcbgroup|co-opbank)\\.co\\.ke)",
-      "reason": "Suspicious or non-official link detected"
+      "pattern": "\\bwithin (\\d+|\\bone|two|three) ?(hrs?|hours)\\b|\\b24hrs?\\b|\\binstant approval\\b",
+      "reason": "Promises of unrealistically fast disbursement or approval to create a sense of urgency and prevent critical thinking."
+    },
+    {
+      "pattern": "\\b(favourable|low) interest rates?\\b|\\bminimal documentation\\b|\\b(terms|conditions) apply\\b",
+      "reason": "Offers that seem too good to be true, often with vague terms and conditions, masking a fraudulent intent."
+    },
+    {
+      "pattern": "\\breply\\s+(YES|LOAN|YESLOAN|apply)\\b|\\bcall\\/sms\\/WhatsApp\\b\\s*(this number)\\b",
+      "reason": "Direct calls to action that push the user to initiate contact via an unofficial channel, making them vulnerable to further manipulation."
+    },
+    {
+      "pattern": "\\b(emergency|urgent|quick|instant) (loan|cash)\\b",
+      "reason": "Exploits emotional urgency to get users to act quickly without thinking."
+    },
+    {
+      "pattern": "\\b(top[- ]?ups?|buy[- ]?offs?)\\b",
+      "reason": "Loan offers that use specific financial jargon to sound legitimate, often promising to 'buy off' existing loans."
+    },
+    {
+      "pattern": "\\b(you have received|credited)\\b.*\\bKSh\\s*\\d{1,7}\\b.*\\b(click link|verify|confirm|reverse|refund)\\b",
+      "reason": "Fake transaction messages claiming money has been received, followed by a request to click a link or send money back, which is often a phishing or reversal scam."
+    },
+    {
+      "pattern": "\\b(fake old|new) M[- ]?PESA message\\b|\\b(new|current) M[- ]?PESA balance.*locked\\b",
+      "reason": "Use of manipulated M-Pesa messages or claims of a locked balance to trigger a panicked response from the user."
+    },
+    {
+      "pattern": "\\b(refund|reverse|disburse|sent|credited).*\\bby mistake\\b",
+      "reason": "Scammers send a small amount of money and then claim it was a mistake, asking the recipient to reverse a larger, legitimate amount or to send money to a different number."
+    },
+    {
+      "pattern": "\\b(account verification|update your account|verify your identity)\\b.*\\b(required|mandatory)\\b",
+      "reason": "Phishing attempts disguised as account security or maintenance requests to steal login credentials."
+    },
+    {
+      "pattern": "\\b(bank transfer failed|payment failed)\\b.*\\b(provide|confirm) (account number|PIN|OTP|M-Pesa)\\b",
+      "reason": "Claims of a failed transaction used as a pretext to get sensitive banking or M-Pesa details."
+    },
+    {
+      "pattern": "\\b(job offer|hiring|recruitment|vacancy)\\b.*\\b(just send|just pay|application fee|registration fee|uniform|training fee)\\b",
+      "reason": "Job scams that demand an upfront payment for an application, uniform, or training."
+    },
+    {
+      "pattern": "\\bshortlisted\\b|\\byou have been shortlisted\\b.*for (job|interview)\\b",
+      "reason": "Messages claiming a user is shortlisted for a fake job to create excitement and lower their guard."
+    },
+    {
+      "pattern": "\\b(no experience needed|anyone can apply|minimum requirements)\\b",
+      "reason": "Vague or non-existent job requirements meant to attract a wide range of applicants, making the scam more effective."
+    },
+    {
+      "pattern": "\\b(KSh \\d{1,6} to KSh \\d{1,7})\\b.*\\b(per day|per week|per hour)\\b",
+      "reason": "Promises of very high salaries or quick compensation that are not realistic for the job being offered."
+    },
+    {
+      "pattern": "\\b(visa|work abroad|job abroad)\\b.*\\b(paid by you|you cover)\\b",
+      "reason": "Fake overseas job offers where the scammer asks the victim to pay for their own travel or visa expenses."
+    },
+    {
+      "pattern": "\\b(Gmail|Yahoo|Hotmail|Outlook) email addresses\\b",
+      "reason": "Scammers often use free, personal email accounts instead of official corporate domains."
+    },
+    {
+      "pattern": "\\b(urgent|act now|limited slots|only for today)\\b",
+      "reason": "Urgency tactics to pressure job seekers into acting without doing proper research."
+    },
+    {
+      "pattern": "\\b(M-Shwari|KCB M-PESA|Branch|Inuka Mkopo|Tala)\\b.*\\b(apply|call|whatsapp|sms|link|click)\\b",
+      "reason": "Fake loan offers impersonating legitimate platforms to collect personal information or fees."
+    },
+    {
+      "pattern": "\\b(Hustler Fund|government credit scheme)\\b.*\\b(imprisonment|jail|penalty|default|repayment)\\b",
+      "reason": "False claims about legal consequences for government loan defaulters to create fear and urgency."
+    },
+    {
+      "pattern": "\\b(Fantasy44|Betika|Safaribet|Chachisha|Odibets)\\b.*\\b(winner|bonus|deposit|free bet|free money|claim)\\b.*\\b(link|verify|account|paybill|till)\\b",
+      "reason": "Scammers impersonate betting platforms, offering fake winnings or bonuses to trick users into sending money or sharing details."
+    },
+    {
+      "pattern": "\\b(sure bet|betting predictions|betting tips|betting signals)\\b.*\\b(buy|pay|subscribe|join)\\b.*\\b(500|1000|2000)\\b",
+      "reason": "Fraudsters sell fake betting tips or predictions with inflated success claims."
+    },
+    {
+      "pattern": "\\b(win|congratulations|prize|cash prize)\\b",
+      "reason": "Contains winning or prize claim language to get the user's attention."
+    },
+    {
+      "pattern": "\\b(claim|redeem|offer ends|deadline)\\b",
+      "reason": "Language that creates urgency to claim a reward or prize."
+    },
+    {
+      "pattern": "\\b(pin|OTP|password|credential|log-in)\\b",
+      "reason": "Requests for sensitive credentials that a legitimate organization would never ask for via message."
+    },
+    {
+      "pattern": "http[s]?:\\/\\/(?!www\\.(safaricom|equitybank|kcbgroup|co-opbank|nhif)\\.co\\.ke)",
+      "reason": "Detects suspicious or non-official links by checking if they are not from a trusted Kenyan domain."
     },
     {
       "pattern": "\\bM[- ]?Pesa\\b.{0,15}(confirm|reverse|refund)",
-      "reason": "Suspicious M-Pesa reversal or confirmation request"
+      "reason": "Flags suspicious M-Pesa messages that ask the user to confirm a reversal or refund, which could be a scam."
     },
     {
-      "pattern": "\\bloan approved\\b|\\bquick loan\\b|\\bno collateral\\b",
-      "reason": "Predatory or fake loan offer"
+      "pattern": "\\b(crypto|bitcoin|USDT|Ethereum|forex signals|investment returns|double your money)\\b",
+      "reason": "Identifies suspicious investment or cryptocurrency schemes that promise unrealistically high returns."
     },
     {
-      "pattern": "\\bjob\\b.{0,20}\\bfee\\b|\\bregistration fee\\b",
-      "reason": "Job scam requiring upfront payment"
+      "pattern": "\\b(NSSF refund|NHIF refund|KRA refund|tax clearance|pension payout)\\b",
+      "reason": "Government refund/payout scams targeting individuals."
     },
     {
-      "pattern": "\\bcall this number\\b|\\bcontact us immediately\\b",
-      "reason": "Pushes urgent unsolicited contact"
+      "pattern": "\\b(Inua Jamii|Inua Jamii Foundation)\\b.*\\b(empowerment|financial support|grant)\\b.*\\b(apply|register|whatsapp|link|click)\\b",
+      "reason": "Scams impersonating government social welfare programs to collect personal data or fees."
+    },
+    {
+      "pattern": "\\b(SHA|Social Health Authority|NHIF)\\b.*\\b(pay months|access services|register|update)\\b.*\\b(fee|payment|whatsapp|sms)\\b",
+      "reason": "Scams impersonating health insurance schemes that require upfront payments or personal details."
+    },
+    {
+      "pattern": "\\b(tuma kwa hii number|send to this number)\\b.*\\b(personal line|MPESA)\\b",
+      "reason": "Instructions to send money to a personal number instead of a legitimate paybill or till number."
+    },
+    {
+      "pattern": "\\b(fake documentation|passport|ID|certificate)\\b.*\\b(pay till|whatsapp|fee)\\b",
+      "reason": "Syndicates offering fake documents for a fee."
+    },
+    {
+      "pattern": "\\b(AI|deepfake|voice clone)\\b.*\\b(call|message|video)\\b.*\\b(family emergency|urgent help|send money)\\b",
+      "reason": "AI-generated scams using deepfakes or voice cloning for extortion or fraud."
+    },
+    {
+      "pattern": "\\b(SIM swap|line upgrade|number verification)\\b.*\\b(PIN|OTP|confirm|provide)\\b",
+      "reason": "SIM swap scams to gain access to mobile money or banking apps."
     }
   ],
   "safe_patterns": [
     {
-      "pattern": "\\bthank you\\b|\\bthanks\\b",
-      "reason": "Polite and normal conversation language"
+      "pattern": "\\b(thank you|thanks)\\b",
+      "reason": "Polite and normal conversation language, generally not used in scams."
     },
     {
-      "pattern": "\\bmeeting\\b|\\bappointment\\b|\\bschedule\\b",
-      "reason": "Legitimate scheduling context"
+      "pattern": "\\b(meeting|appointment|schedule|reminder)\\b",
+      "reason": "Legitimate scheduling or reminder context."
     },
     {
-      "pattern": "\\bhello\\b|\\bhi\\b|\\bgood morning\\b|\\bgood evening\\b",
-      "reason": "Common greeting from personal contacts"
+      "pattern": "\\b(hello|hi|good morning|good evening|how are you)\\b",
+      "reason": "Common greetings from personal contacts."
     },
     {
-      "pattern": "\\bsee you\\b|\\bcatch up\\b|\\btalk later\\b",
-      "reason": "Casual personal conversation"
+      "pattern": "\\b(see you|catch up|talk later)\\b",
+      "reason": "Casual, personal conversation sign-offs."
     },
     {
-      "pattern": "\\binvoice\\b|\\breceipt\\b|\\border number\\b",
-      "reason": "Likely a legitimate transaction"
+      "pattern": "\\b(invoice|receipt|order number|payment received)\\b",
+      "reason": "Indicates a legitimate transaction confirmation."
     },
     {
-      "pattern": "\\bmeeting link\\b|\\bzoom\\b|\\bgoogle meet\\b",
-      "reason": "Work/learning related communication"
+      "pattern": "\\b(mpesa confirmed|you have received|transaction successful)\\b",
+      "reason": "Official and legitimate M-Pesa transaction confirmation."
+    },
+    {
+      "pattern": "\\b(exam timetable|class schedule|student portal|results out)\\b",
+      "reason": "Legitimate academic communication."
+    },
+    {
+      "pattern": "\\b(weather|news update|daily tip)\\b",
+      "reason": "Informational messages that do not require any action or personal information."
+    },
+    {
+      "pattern": "\\b(family|friend|update)\\b",
+      "reason": "Personal check-ins from known contacts."
+    },
+    {
+      "pattern": "\\b(appointment reminder|doctor visit|health check)\\b",
+      "reason": "Legitimate medical or service reminders."
+    },
+    {
+      "pattern": "\\b(bank statement|account summary|official notification)\\b",
+      "reason": "Official communications from a bank or service provider without urgent requests."
     }
   ]
 }
